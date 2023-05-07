@@ -41,3 +41,11 @@ Content-Type: application/json
 
 ### delete todo
 DELETE http://127.0.0.1:3000/todos/2
+
+### create empty todo
+POST http://127.0.0.1:3000/todos
+Content-Type: application/json
+
+{
+  "text": ""
+}

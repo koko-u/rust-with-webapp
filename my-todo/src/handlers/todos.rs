@@ -5,11 +5,12 @@ use axum::response::IntoResponse;
 use axum::{extract, http, Extension, Json};
 
 use crate::models::todos::{CreateTodo, UpdateTodo};
+use crate::payloads::ValidatedJson;
 use crate::repositories::TodoRepository;
 
 pub async fn create_todo<T>(
     Extension(repository): Extension<Arc<T>>,
-    Json(payload): Json<CreateTodo>,
+    ValidatedJson(payload): ValidatedJson<CreateTodo>,
 ) -> impl IntoResponse
 where
     T: TodoRepository,
@@ -44,7 +45,7 @@ where
 pub async fn update_todo<T>(
     Extension(repository): Extension<Arc<T>>,
     extract::Path(id): extract::Path<u64>,
-    Json(payload): Json<UpdateTodo>,
+    ValidatedJson(payload): ValidatedJson<UpdateTodo>,
 ) -> Result<impl IntoResponse, ServerError>
 where
     T: TodoRepository,
