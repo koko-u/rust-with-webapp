@@ -1,0 +1,10 @@
+### hello world
+GET http://127.0.0.1:3000/
+
+### create user
+POST http://127.0.0.1:3000/users
+Content-Type: application/json
+
+{
+  "username": "清水 次郎"
+}
