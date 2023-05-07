@@ -1,10 +1,43 @@
 ### hello world
 GET http://127.0.0.1:3000/
 
-### create user
-POST http://127.0.0.1:3000/users
+### create todo1
+POST http://127.0.0.1:3000/todos
 Content-Type: application/json
 
 {
-  "username": "清水 次郎"
+  "text": "買い物に出かける"
 }
+
+### create todo2
+POST http://127.0.0.1:3000/todos
+Content-Type: application/json
+
+{
+  "text": "ジョギングをする"
+}
+
+### find todo
+GET http://127.0.0.1:3000/todos/1
+
+### find all todos
+GET http://127.0.0.1:3000/todos
+
+### complete todo
+PATCH http://127.0.0.1:3000/todos/1
+Content-Type: application/json
+
+{
+  "completed": true
+}
+
+### update todo's text
+PATCH http://127.0.0.1:3000/todos/2
+Content-Type: application/json
+
+{
+  "text": "ジョギングを５キロ行う"
+}
+
+### delete todo
+DELETE http://127.0.0.1:3000/todos/2
