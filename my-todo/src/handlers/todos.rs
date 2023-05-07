@@ -11,13 +11,15 @@ use crate::repositories::TodoRepository;
 pub async fn create_todo<T>(
     Extension(repository): Extension<Arc<T>>,
     ValidatedJson(payload): ValidatedJson<CreateTodo>,
-) -> impl IntoResponse
+) -> Result<impl IntoResponse, ServerError>
 where
     T: TodoRepository,
 {
-    let todo = repository.create(payload);
+    let Ok(todo) = repository.create(payload).await else {
+        return Err(ServerError::StatusError(http::StatusCode::BAD_REQUEST));
+    };
 
-    (http::StatusCode::CREATED, Json(todo))
+    Ok((http::StatusCode::CREATED, Json(todo)))
 }
 
 pub async fn find_todo<T>(
@@ -27,19 +29,23 @@ pub async fn find_todo<T>(
 where
     T: TodoRepository,
 {
-    let Some(todo) = repository.find(id) else {
+    let Ok(todo) = repository.find(id).await else {
         return Err(ServerError::StatusError(http::StatusCode::NOT_FOUND));
     };
 
     Ok((http::StatusCode::OK, Json(todo)))
 }
 
-pub async fn all_todos<T>(Extension(repository): Extension<Arc<T>>) -> impl IntoResponse
+pub async fn all_todos<T>(
+    Extension(repository): Extension<Arc<T>>,
+) -> Result<impl IntoResponse, ServerError>
 where
     T: TodoRepository,
 {
-    let todos = repository.all();
-    (http::StatusCode::OK, Json(todos))
+    let Ok(todos) = repository.all().await else {
+        return Err(ServerError::StatusError(http::StatusCode::NOT_FOUND));
+    };
+    Ok((http::StatusCode::OK, Json(todos)))
 }
 
 pub async fn update_todo<T>(
@@ -50,7 +56,7 @@ pub async fn update_todo<T>(
 where
     T: TodoRepository,
 {
-    let Ok(todo) = repository.update(id, payload) else {
+    let Ok(todo) = repository.update(id, payload).await else {
         return Err(ServerError::StatusError(http::StatusCode::NOT_FOUND));
     };
     Ok((http::StatusCode::OK, Json(todo)))
@@ -63,7 +69,7 @@ pub async fn delete_todo<T>(
 where
     T: TodoRepository,
 {
-    match repository.delete(id) {
+    match repository.delete(id).await {
         Ok(_) => http::StatusCode::NO_CONTENT,
         Err(_) => http::StatusCode::NOT_FOUND,
     }

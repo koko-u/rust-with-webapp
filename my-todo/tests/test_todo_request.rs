@@ -16,9 +16,11 @@ async fn should_find_todo() -> anyhow::Result<()> {
     let expected = Todo::new(1, "should find todo");
 
     let repository = TodoRepositoryInMemory::new();
-    repository.create(CreateTodo {
-        text: "should find todo".to_string(),
-    });
+    repository
+        .create(CreateTodo {
+            text: "should find todo".to_string(),
+        })
+        .await?;
 
     let req = build_todo_request("/todos/1", http::Method::GET, JsonOrEmpty::Empty)?;
     let res = create_app(repository).oneshot(req).await?;
@@ -35,9 +37,11 @@ async fn should_get_all_todos() -> anyhow::Result<()> {
     let expected = Todo::new(1, "should all todo");
 
     let repository = TodoRepositoryInMemory::new();
-    repository.create(CreateTodo {
-        text: "should all todo".to_string(),
-    });
+    repository
+        .create(CreateTodo {
+            text: "should all todo".to_string(),
+        })
+        .await?;
 
     let req = build_todo_request("/todos", http::Method::GET, JsonOrEmpty::Empty)?;
     let res = create_app(repository).oneshot(req).await?;
@@ -54,9 +58,11 @@ async fn should_update_todo() -> anyhow::Result<()> {
     let expected = Todo::new(1, "should update todo");
 
     let repository = TodoRepositoryInMemory::new();
-    repository.create(CreateTodo {
-        text: "before update todo".to_string(),
-    });
+    repository
+        .create(CreateTodo {
+            text: "before update todo".to_string(),
+        })
+        .await?;
 
     let req = build_todo_request::<JsonOrEmpty>(
         "/todos/1",
@@ -75,9 +81,11 @@ async fn should_update_todo() -> anyhow::Result<()> {
 #[tokio::test]
 async fn should_delete_todo() -> anyhow::Result<()> {
     let repository = TodoRepositoryInMemory::new();
-    repository.create(CreateTodo {
-        text: "should delete todo".to_string(),
-    });
+    repository
+        .create(CreateTodo {
+            text: "should delete todo".to_string(),
+        })
+        .await?;
 
     let req = build_todo_request("/todos/1", http::Method::DELETE, JsonOrEmpty::Empty)?;
     let res = create_app(repository).oneshot(req).await?;

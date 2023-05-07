@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 use anyhow::{bail, Context};
+use axum::async_trait;
 
 use crate::errors::RepositoryError;
 use crate::models::todos::{CreateTodo, Todo, UpdateTodo};
@@ -35,26 +36,32 @@ impl TodoRepositoryInMemory {
     }
 }
 
+#[async_trait]
 impl TodoRepository for TodoRepositoryInMemory {
-    fn create(&self, payload: CreateTodo) -> Todo {
+    async fn create(&self, payload: CreateTodo) -> anyhow::Result<Todo> {
         let id = self.max_id() + 1;
         let mut store = self.write_store_ref();
         let todo = Todo::new(id, &payload.text);
         store.insert(id, todo.clone());
-        todo
+        Ok(todo)
     }
 
-    fn find(&self, id: u64) -> Option<Todo> {
+    async fn find(&self, id: u64) -> anyhow::Result<Todo> {
         let store = self.read_store_ref();
-        store.get(&id).cloned()
+        let Some(todo) = store.get(&id) else {
+                bail!(RepositoryError::NotFound(id));
+            };
+        Ok(todo.clone())
     }
 
-    fn all(&self) -> Vec<Todo> {
+    async fn all(&self) -> anyhow::Result<Vec<Todo>> {
         let store = self.read_store_ref();
-        store.values().cloned().collect()
+        let todos = store.values().cloned().collect();
+
+        Ok(todos)
     }
 
-    fn update(&self, id: u64, payload: UpdateTodo) -> anyhow::Result<Todo> {
+    async fn update(&self, id: u64, payload: UpdateTodo) -> anyhow::Result<Todo> {
         let mut store = self.write_store_ref();
         let todo = store.get(&id).context(RepositoryError::NotFound(id))?;
 
@@ -72,7 +79,7 @@ impl TodoRepository for TodoRepositoryInMemory {
         Ok(todo)
     }
 
-    fn delete(&self, id: u64) -> anyhow::Result<()> {
+    async fn delete(&self, id: u64) -> anyhow::Result<()> {
         let mut store = self.write_store_ref();
         let Some(_) = store.remove(&id) else {
             bail!(RepositoryError::NotFound(id));

@@ -1,0 +1,6 @@
+-- Add up migration script here
+CREATE TABLE IF NOT EXISTS todos (
+    id BIGINT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    text VARCHAR(256) NOT NULL,
+    completed BOOLEAN NOT NULL DEFAULT FALSE
+);
