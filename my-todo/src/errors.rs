@@ -8,6 +8,8 @@ use validator::ValidationErrors;
 pub enum RepositoryError {
     #[error("Not Found, id: {0}")]
     NotFound(u64),
+    #[error("Unexpected Error: {0}")]
+    Unexpected(String),
 }
 
 #[derive(Debug, Error)]

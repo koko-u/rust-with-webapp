@@ -1,7 +1,8 @@
 use serde::{Deserialize, Serialize};
+use sqlx::FromRow;
 use validator::Validate;
 
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq, FromRow)]
 pub struct Todo {
     pub id: u64,
     pub text: String,

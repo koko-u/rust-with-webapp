@@ -10,4 +10,5 @@ pub trait TodoRepository: Clone + Send + Sync + 'static {
     async fn delete(&self, id: u64) -> anyhow::Result<()>;
 }
 
+pub mod db;
 pub mod in_memory;
